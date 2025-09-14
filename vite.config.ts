@@ -9,6 +9,6 @@ export default defineConfig({
     host: true, // cho phép network access
     port: 5173,
     // Thêm dòng này public ngrok:
-    allowedHosts: ["8eeae0d4b9ea.ngrok-free.app"],
+    // allowedHosts: ["8eeae0d4b9ea.ngrok-free.app"],
   },
 });
