@@ -3,7 +3,6 @@ import type { Episodes, Movies } from "../models/Movies";
 import { useEffect, useRef, useState } from "react";
 import { axiosCall } from "../plugin/axiosCall";
 import { Play } from "lucide-react";
-import thumb_url from "../assets/backgroud.png";
 import Hls from "hls.js";
 
 export const Watch = () => {
@@ -90,7 +89,7 @@ export const Watch = () => {
                   <div className="flex items-center space-x-3">
                     <div className="relative">
                       <img
-                        src={movie.thumb_url || thumb_url}
+                        src={movie.thumb_url || "https://i.pinimg.com/1200x/d0/4a/b4/d04ab4a87c283f94fd6e156a6a405580.jpg"}
                         alt={episode.filename}
                         className="w-16 h-10 object-cover rounded"
                       />
