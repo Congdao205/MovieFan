@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useParams, useSearchParams } from "react-router-dom"
 import { axiosCall } from "../plugin/axiosCall";
-import { MovieCard} from "../Components/Layouts/MovieCard";
+import { MovieCard } from "../Components/Layouts/MovieCard";
 import { Pagination } from "../Components/Common/Pagination";
 import { LoadingSkeleton } from "../Components/Common/LoadingSkeleton";
 import type { Movies } from "../models/Movies";
@@ -11,18 +11,15 @@ import type { Movies } from "../models/Movies";
 export const ListMovies = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [movies, setMovies] = useState<Movies[]>([]);
-  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [titlePage, setTitlePage] = useState();
   const [loading, setLoading] = useState(true);
 
-  type Props = {
-    slug?: string,
-    page: number
-  }
+  const page = Number(searchParams.get("page")) || 1;
 
-  const fetchMovies = async ({ slug, page }: Props) => {
+  const fetchMovies = async () => {
     try {
       setLoading(true);
       setMovies([]);
@@ -40,15 +37,10 @@ export const ListMovies = () => {
       setLoading(false);
     }
   }
-
+  
   useEffect(() => {
-    fetchMovies({ slug, page });
+    fetchMovies();
   }, [slug, page]);
-
-  useEffect(() => {
-    setPage(1);
-    setMovies([]);
-  }, [slug]);
 
   return (
     <div>
@@ -57,17 +49,17 @@ export const ListMovies = () => {
         <div className="grid grid-cols-2 gap-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <LoadingSkeleton loading items={12}></LoadingSkeleton>
         </div>
-        
-      ) : movies && movies.length > 0 ?(
+
+      ) : movies && movies.length > 0 ? (
         <div className="grid grid-cols-2 gap-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {movies.map((movie) => (
-          <MovieCard key={movie.slug} data={movie} />
-        ))}
-      </div>
+          {movies.map((movie) => (
+            <MovieCard key={movie.slug} data={movie} />
+          ))}
+        </div>
       ) : (
         <LoadingSkeleton empty></LoadingSkeleton>
       )}
-        <Pagination onPageChange={setPage} totalPages={totalPages} page={page}></Pagination> 
+      <Pagination onPageChange={(setPage) => setSearchParams({ page: setPage.toString() })} totalPages={totalPages} page={page}></Pagination>
     </div>
   )
 }
