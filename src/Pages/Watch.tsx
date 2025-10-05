@@ -46,8 +46,8 @@ export const Watch = () => {
     const video = videoRef.current;
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      video.play();
-    } else if (typeof Hls.isSupported()) {
+      video.play().catch(() => {});
+    } else if (Hls.isSupported() {
       const hls = new Hls();  
       hls.loadSource(src);
       hls.attachMedia(video);
