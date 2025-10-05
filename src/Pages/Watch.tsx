@@ -46,8 +46,8 @@ export const Watch = () => {
     const video = videoRef.current;
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      video.play().catch(() => {});
-    } else if (typeof Hls.isSupported === "function" ? Hls.isSupported() : Hls.isSupported) {
+      video.play();
+    } else if (typeof Hls.isSupported()) {
       const hls = new Hls();  
       hls.loadSource(src);
       hls.attachMedia(video);
@@ -74,7 +74,7 @@ export const Watch = () => {
   return (
     <div className="text-white container mx-auto my-6">
       <div className="rounded-lg border mb-5">
-        <video ref={videoRef} controls muted className="w-full h-full rounded-lg" />
+        <video ref={videoRef} controls className="w-full h-full rounded-lg" />
       </div>
 
       <div className="rounded-lg border">
