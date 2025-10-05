@@ -3,7 +3,7 @@ import type { EpisodeItem, Movies } from "../models/Movies";
 import { useEffect, useRef, useState } from "react";
 import { axiosCall } from "../plugin/axiosCall";
 import { Play } from "lucide-react";
-import Hls from "hls.js";
+import Hls from 'hls.js';
 
 export const Watch = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -46,14 +46,17 @@ export const Watch = () => {
     const video = videoRef.current;
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-    } else if (Hls.isSupported()) {
+      video.play().catch(() => {});
+    } else if (typeof Hls.isSupported === "function" ? Hls.isSupported() : Hls.isSupported) {
       const hls = new Hls();  
       hls.loadSource(src);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_LOADED, () => {
-        video.play();
+        video.play().catch(err => console.log("Play error:", err));;
       });
       return () => hls.destroy();
+    }else {
+        video.src = "";
     }
 
   }, [episodes, currentEpisodeIndex]);
