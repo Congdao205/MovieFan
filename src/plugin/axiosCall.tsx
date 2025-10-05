@@ -8,14 +8,7 @@ export const axiosCall = {
       });
       const data = response.data;
 
-      // if (data?.items) {
-      //   return data.items;
-      // }else{
-      //   return data.data.items;
-      // }
-
       return data;
-
 
     } catch (error) {
       console.log("API GET error: ", error);

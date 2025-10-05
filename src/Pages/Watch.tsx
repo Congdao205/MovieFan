@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import type { Episodes, Movies } from "../models/Movies";
+import type { EpisodeItem, Movies } from "../models/Movies";
 import { useEffect, useRef, useState } from "react";
 import { axiosCall } from "../plugin/axiosCall";
 import { Play } from "lucide-react";
@@ -8,7 +8,7 @@ import Hls from "hls.js";
 export const Watch = () => {
   const { slug } = useParams<{ slug: string }>();
   const [movie, setMovie] = useState<Movies | null>(null);
-  const [episodes, setEpisodes] = useState<Episodes[]>([]);
+  const [episodes, setEpisodes] = useState<EpisodeItem[]>([]);
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -22,7 +22,9 @@ export const Watch = () => {
           `${import.meta.env.VITE_MOVIE_DETAIL_URL}${slug}`
         );
         setMovie(data.movie);
-        setEpisodes(data.episodes || []);
+        const flatEpisodes = data.episodes?.[0]?.server_data || [];
+        setEpisodes(flatEpisodes);
+        setCurrentEpisodeIndex(0);
       } catch (error) {
         console.error("Error fetching movie:", error);
       } finally {
@@ -37,20 +39,22 @@ export const Watch = () => {
   useEffect(() => {
     if (!episodes.length || !videoRef.current) return;
 
-    const src = episodes[0]?.server_data?.[currentEpisodeIndex]?.link_m3u8;
+    const src = episodes[currentEpisodeIndex]?.link_m3u8;
+
     if (!src) return;
 
     let hls: Hls | null = null;
-
     const video = videoRef.current;
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
       video.play();
-    } else if (Hls.isSupported()) {
-      hls = new Hls();
+    } else if (Hls.isSupported() && src) {
+      hls = new Hls();  
       hls.loadSource(src);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_LOADED, () => video.play());
+    }else{
+      alert("Trình duyệt không hỗ trợ phát video HLS (.m3u8)");
     }
 
     return () => {
@@ -66,7 +70,7 @@ export const Watch = () => {
     return <p className="text-white container mx-auto my-6">Không tìm thấy phim</p>;
   }
 
-  const serverData = episodes[0]?.server_data ?? [];
+  const serverData = episodes;
 
   return (
     <div className="text-white container mx-auto my-6">
