@@ -42,12 +42,15 @@ export const Watch = () => {
 
     let hls: Hls | null = null;
 
-    if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
-      videoRef.current.src = src;
+    const video = videoRef.current;
+    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = src;
+      video.play();
     } else if (Hls.isSupported()) {
       hls = new Hls();
       hls.loadSource(src);
-      hls.attachMedia(videoRef.current);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_LOADED, () => video.play());
     }
 
     return () => {
