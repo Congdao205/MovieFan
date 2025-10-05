@@ -43,23 +43,19 @@ export const Watch = () => {
 
     if (!src) return;
 
-    let hls: Hls | null = null;
     const video = videoRef.current;
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      video.play();
-    } else if (Hls.isSupported() && src) {
-      hls = new Hls();  
+    } else if (Hls.isSupported()) {
+      const hls = new Hls();  
       hls.loadSource(src);
       hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_LOADED, () => video.play());
-    }else{
-      alert("Trình duyệt không hỗ trợ phát video HLS (.m3u8)");
+      hls.on(Hls.Events.MANIFEST_LOADED, () => {
+        video.play();
+      });
+      return () => hls.destroy();
     }
 
-    return () => {
-      if (hls) hls.destroy();
-    };
   }, [episodes, currentEpisodeIndex]);
 
   if (loading) {
@@ -75,7 +71,7 @@ export const Watch = () => {
   return (
     <div className="text-white container mx-auto my-6">
       <div className="rounded-lg border mb-5">
-        <video ref={videoRef} controls className="w-full h-full rounded-lg" />
+        <video ref={videoRef} controls muted className="w-full h-full rounded-lg" />
       </div>
 
       <div className="rounded-lg border">
